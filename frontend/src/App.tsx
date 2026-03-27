@@ -11,14 +11,13 @@ useEffect(()=>{
 
 
 const ws = new WebSocket("ws://localhost:8080")
-if(!ws){
-    return 
-  }
   setSocket(ws)
 ws.onmessage=(msg)=>{
 
   alert(msg.data)
 }
+return () => ws.close()
+
 
 },[])
 
@@ -26,6 +25,7 @@ ws.onmessage=(msg)=>{
 
   function sendmessage(){
     socket?.send(input)
+    setinput("")
 
   }
   return (
