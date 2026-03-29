@@ -6,23 +6,15 @@ interface msgs{
     data?:string
     type:string
 }
-
-interface room {
-    roomid:string,
-    User:WebSocket[]
-}
-
-const roomactive:room[]= [] 
-
-
+type id =string
+const rooms:Map<id,Set<WebSocket>> =new Map()
+const sockets:Map<WebSocket,id>=new Map()
+// todo to make sure client is present in only one room 
 function roomcreation(a:WebSocket):string{
 const id = crypto.randomUUID()
-
-const room:room={
-    roomid:id,
-    User:[a]
-}
-roomactive.push(room)
+rooms.set(id,new Set)
+rooms.get(id)?.add(a)
+sockets.set(a,id)
 return id
 }
 
@@ -38,31 +30,46 @@ wss.on("connection",(socket)=>{
         }
         
         if (msg.type==="join"&&msg.data){
-            console.log(msg.data)
-            let tr=0;
-             roomactive.map((t)=>{
-                if (t.roomid=== msg.data){
-                    t.User.push(socket)
-                    tr+=1
-                    socket.send("You succefull joinned the room")
-                    
-                }
-            })
-            if(tr===0){
-                 socket.send("Cant find room with taht id")
 
-             }
+            if(rooms.has(msg.data)){
+                rooms.get(msg.data)?.add(socket)
+                sockets.set(socket,msg.data)
+                socket.send("Connected to room succesfully")
+            }
+            
+            //  roomactive.map((t)=>{
+            //     if (t.roomid=== msg.data){
+            //         t.User.push(socket)
+                   
+            //         socket.send("You succefull joinned the room")
+                    
+            //     }
+            // })
+          
              
              
 
         }
 
+        if (msg.type==="broadcast"&&msg.data){
+            if (sockets.has(socket)){
+                const roomid=sockets.get(socket)
+                //@ts-ignore
+                const allembers=rooms.get(roomid)
+                    for (const client of allembers!){
+                        if (client!==socket){
+                            client.send(msg.data)
+                    }
+                }
+                socket.send("Succesfully deliverd")
+            }
+            else{
+                socket.send("Join the room first room")
+            }
 
-        // wss.clients.forEach((client)=>{
-        // if(client!==socket){
-        //     client.send(msg) 
-        // }
-        // })
+
+
+        }
 
     })
     
