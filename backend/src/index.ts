@@ -4,11 +4,12 @@ const wss = new WebSocketServer({port:8080})
 
 interface msgs{
     data?:string
-    type:string
+    type:"create"|"broadcast"|"join"|"leave"|"pong"
 }
 type id =string
 const rooms:Map<id,Set<WebSocket>> =new Map()
 const sockets:Map<WebSocket,id>=new Map()
+const heartbeat = new Map<WebSocket, number>();
 // todo to make sure client is present in only one room
 
 function leaveCurrentroom(a:WebSocket){
@@ -42,10 +43,17 @@ function Leaveroom(a:WebSocket,room:string){
 }
 
 wss.on("connection",(socket)=>{
-
+heartbeat.set(socket,Date.now())
     socket.on("message",(Raw)=>{
-        const msg:msgs=JSON.parse(Raw.toString())
         
+        let msg:msgs
+        try{
+
+        msg=JSON.parse(Raw.toString())
+        }
+        catch(e){
+            return
+        }
         if (msg.type==="create"){
             const id=roomcreation(socket)
             socket.send("Room id "+id)
@@ -83,17 +91,38 @@ wss.on("connection",(socket)=>{
             if (room){
                 Leaveroom(socket,room)
                 socket.send("Left the room")
+                heartbeat.delete(socket)
                 socket.close()
 
             }
             
 
         }
+        if(msg.type==="pong"){
+             heartbeat.set(socket, Date.now());
+        }
 
     })
     socket.on("close",()=>{
         leaveCurrentroom(socket)
+        heartbeat.delete(socket)
     })
-
     
 })
+setInterval(()=>{
+    const now = Date.now()
+    for (const [ws,date] of heartbeat){
+        if(now-date>30000){
+            heartbeat.delete(ws)
+            leaveCurrentroom(ws)
+             continue;
+        }
+        if (ws.readyState===WebSocket.OPEN){
+            ws.ping();
+        }
+
+    }
+
+               
+    },10000)
+
