@@ -1,12 +1,9 @@
 import { Pool } from "pg";
 
 export const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME
-})
+  connectionString:
+    process.env.DB_URL,
+});
 pool.on("connect", () => {
   console.log("connection with database is succeful");
 })
