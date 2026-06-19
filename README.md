@@ -17,3 +17,7 @@ till here i solved evry problem there are still some place  where i can add to c
 When i broadcast it loops throgh every socket present in the room and as per my understanding about websockets we cannot share in-memory room state across horizontally scaled servers
 which are in two diff server we cannot keep them in one room here coomes something called Pub-sub instance  its nothing but traffic is spread between servers and server are all connnect to a pub sub server 
 gut 
+
+next Step is adding getting the app from inmem to presistant db so adding pgsql the initial schema i thought was this 
+
+![Design](./image.png)

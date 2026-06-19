@@ -27,4 +27,4 @@ applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
     }
   process.exit(0);
 }
-
+main()
