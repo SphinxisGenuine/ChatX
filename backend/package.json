@@ -12,11 +12,20 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^5.0.6",
     "@types/pg": "^8.20.0",
     "@types/ws": "^8.18.1",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.21.0",
     "typescript": "^6.0.2",
-    "ws": "^8.20.0"
+    "ws": "^8.20.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
