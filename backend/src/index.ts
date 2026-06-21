@@ -1,13 +1,19 @@
 import express from "express"
 import bcrypt from "bcrypt";
 import dotenv from "dotenv"
+import http from "http"
 import { loginschema, userschema, type User } from "./db/types/user.types.js"
 import { CreateUser, findbyEmail, findbyUsername } from "./db/queries/user.repositrie.js";
 import jwt  from "jsonwebtoken";
+import { WebSocketServer } from "ws";
 dotenv.config()
 
 
  const app = express()
+ const server = http.createServer(app)
+ const wss=new WebSocketServer({
+    noServer:true
+ })
 app.use(express.json())
 app.post('/register',async (req,res)=>{
     console.log(req.body)
@@ -53,7 +59,34 @@ const result = loginschema.safeParse(req.body)
 })
 
 
+server.on("upgrade",(req:any,socket,head)=>{
+      try {
+        const url = new URL(req.url, "http://localhost")
+        if (url.pathname !== "/ws") {
+      socket.destroy();
+      return;
+    }
+    const token =url.searchParams.get("token")
+    if (!token||token===""){ socket.write("HTTP/1.1 401 Unauthorized\n");socket.destroy(); return;}
+    const payload = jwt.verify(token,process.env.SECRET!)
+    req.user=payload;
+    
+     wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit("connection", ws, req);
+    });
+      }
+      catch {
+        socket.write("HTTP/1.1 401 Unauthorized\n");
+        socket.destroy();
+      }
+})
+wss.on("connection",(ws,req:any)=>{
+      ws.send("authenticated");
+    console.log("connection has been upgraded to ws"); 
+})
 
-app.listen(3000,()=>{
+
+
+server.listen(3000,()=>{
     console.log("app is listining on port 3000")
 })
