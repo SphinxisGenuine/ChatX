@@ -21,3 +21,4 @@ gut
 next Step is adding getting the app from inmem to presistant db so adding pgsql the initial schema i thought was this 
 
 ![Design](./image.png)
+So basically added the pgSQL data base so msg are now persisted and one more thing is add the pub sub and understood more intuitively like pub sub is basically a broker  has which has  connection with all the server instance it uusuallly has two connection on publlishing the events and another to subscribing the events but we still have to main two Maps for sending /broadcasting the msgs
