@@ -1,5 +1,5 @@
 import { pool } from "../db.js"
-import type { User } from "../types/user.types.js";
+import type { User } from "../../types/user.types.js";
 
 export async function findbyEmail(email:string){
     const result = await pool.query(`
