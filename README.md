@@ -1,27 +1,38 @@
-the reason I am Building This is to implement Websockets learning
- 
- # ```First
- - The first goal was to create a websocket at client and server side
- -  connecting the client  to server and resonding
- - connectoing multiple browser meanr msg is broadcasted to every browser connected to the ws (Easy bits)
- # ```Second
+# Why I Built This
+
+The reason I am building this project is to learn how WebSockets actually work under the hood and understand how a real-time chat system is designed.
+# First
+- The first goal was to create a WebSocket on both the client and server side.
+- Connect the client to the server and respond back.
+- Connect multiple browsers so that a message is broadcast to every browser connected to the WebSocket.
+These were the easy bits and helped me understand the basic flow.
+ # Second
  - Crating a room is done
  - First thoght was storing array of object containing roomid and User[list of sockets]
 - Using array here is really bad practice we obviously dont want duplicates her so useing a set is so obvious here still at v1 i  did used the array then i also found why it more bad because of the nested loops 0(n^2) using set will make sure add and delting becomes fater due less timecomplexities as per my understanding sets are fast 
-# ```Third
-will  use to maps  one is for going from room id to sockets and another will be socke o room id it will be help us to get while sending msg we dont have to send roomid with it each time joining room and sending msg will be faster has lookup timee has been reduced  
-# ```Forth
-Implementedd leave fuction which cuts connection from server side  while leaving also implemented a function it removes ther user from other room before ccreating and leaving and also if connection dissconectes from the client ide 
-# ```Fifth 
+# Third
+I then introduced two `Map`s.
+- One goes from **Room ID → Set<WebSocket>**
+- The other goes from **WebSocket → Set<Room ID>**
+
+The first map makes broadcasting messages to everyone inside a room much easier.
+
+The second map helps during cleanup. When a socket disconnects, I can immediately know every room it belongs to and remove it without searching through every room.
+
+# Forth
+-Implementedd leave fuction which cuts connection from server side  while leaving also implemented a function it removes ther user from other room before ccreating and leaving and also if connection dissconectes from the client ide 
+# Fifth 
 till here i solved evry problem there are still some place  where i can add to check more things but real bottlneck is 
 When i broadcast it loops throgh every socket present in the room and as per my understanding about websockets we cannot share in-memory room state across horizontally scaled servers
-which are in two diff server we cannot keep them in one room here coomes something called Pub-sub instance  its nothing but traffic is spread between servers and server are all connnect to a pub sub server 
-gut 
+which are in two diff server we cannot keep them in one room here coomes something called Pub-sub instance  its nothing but traffic is spread between servers and server are all connnect to a pub sub server  
 
-next Step is adding getting the app from inmem to presistant db so adding pgsql the initial schema i thought was this 
-
+The next step was moving the application from purely in-memory storage to persistent storage
+I added PostgreSQL so messages are no longer lost after restarting the server.
+The  schema I came up with was:
 ![Design](./image12.png)
-So basically added the pgSQL data base so msg are now persisted and one more thing is add the pub sub and understood more intuitively like pub sub is basically a broker  has which has  connection with all the server instance it uusuallly has two connection on publlishing the events and another to subscribing the events but we still have to main two Maps for sending /broadcasting the msgs
+Adding PostgreSQL solved message persistence.
+ 
+ and one more thing is add the pub sub and understood more intuitively like pub sub is basically a broker  has which has  connection with all the server instance it uusuallly has two connection on publlishing the events and another to subscribing the events but we still have to main two Maps for sending /broadcasting the msgs
 
 
 
