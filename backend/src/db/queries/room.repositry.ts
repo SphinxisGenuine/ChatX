@@ -1,28 +1,36 @@
 import { pool } from "../db.js";
 
-export async function CreateRoom(id:Number,name:String) {
-const client = await pool.connect();
+export async function CreateRoom(userId: number, name: string) {
+  const client = await pool.connect();
 
-try{
-      await client.query(`BEGIN`);
-      const roomresult =await client.query(`INSERT INTO rooms(id,name) 
-        VALUES ($1,$2) RETURNING id
-        `,[id,name])
-        const roomid=roomresult.rows[0].id;
-        const rooommeber=await client.query(`INSERT INTO room_members(user_id,room_id) 
-            VALUES ($1,$2)
-            `,[id,roomid])
-        await client.query(`COMMIT`);
-        return roomid
-    }catch(err){
-        await client.query(`ROLLBACK`);
-        throw err;
- }
- finally{
-client.release()
- }
+  try {
+    await client.query("BEGIN");
+
+    const roomResult = await client.query(
+      `INSERT INTO rooms(name)
+       VALUES ($1)
+       RETURNING id`,
+      [name]
+    );
+
+    const roomId = roomResult.rows[0].id;
+
+    await client.query(
+      `INSERT INTO room_members(user_id, room_id)
+       VALUES ($1, $2)`,
+      [userId, roomId]
+    );
+
+    await client.query("COMMIT");
+
+    return roomId;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
-
 export async function checkmebership(id:Number,roomid:Number){
 const result = await pool.query(`
     SELECT FROM room_members
