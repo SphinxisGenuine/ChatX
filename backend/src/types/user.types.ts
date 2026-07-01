@@ -13,7 +13,7 @@ export const loginschema= z.object({
 export type Login =z.infer<typeof loginschema>  
 
 export type message= {
-    room_name:String
+    room_name:string
     roomid?:number
     content?: string
     type: "create_room" | "send_message" | "join_room" | "leave" 
