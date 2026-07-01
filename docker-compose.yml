@@ -1,0 +1,26 @@
+services:
+  backend:
+      
+      build:
+        context: ./backend     
+      ports:
+       - "3000:3000"
+
+      env_file:
+          - ./backend/.env.docker
+      depends_on:
+      - postgres
+      - redis    
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: myapp
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:7-alpine
+
+    ports:
+    - "6379:6379"

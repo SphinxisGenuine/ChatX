@@ -8,7 +8,12 @@ import jwt from "jsonwebtoken";
 import { WebSocketServer, WebSocket } from "ws";
 import { checkmebership, CreateRoom, joinroom, leaveRoom, sendmessage } from "./db/queries/room.repositry.js";
 import { publisher, subscriber } from "./redis/redis.js";
-dotenv.config()
+
+
+if (!process.env.DATABASE_URL) {
+  dotenv.config();
+}
+
 
 
 const app = express()
